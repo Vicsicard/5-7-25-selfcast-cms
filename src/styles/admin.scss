@@ -1,0 +1,40 @@
+/* Custom admin styles for role-based UI */
+
+/* This CSS will be injected into the admin panel and will hide certain elements based on user role */
+/* We'll add the role as a data attribute on the body tag via custom admin components */
+
+body[data-user-role="user"] {
+  /* Hide collection links except for the user's own site */
+  nav a[href*="/admin/collections"]:not([href*="/admin/collections/users"]):not([href$="/account"]) {
+    display: none !important;
+  }
+
+  /* Hide global navigation items that regular users shouldn't see */
+  nav a[href*="/admin/globals"] {
+    display: none !important;
+  }
+
+  /* Hide the utility links that aren't needed for regular users */
+  div[class*="UtilityNav"] a:not([href$="/account"]):not([href$="/logout"]) {
+    display: none !important;
+  }
+
+  /* Make the dashboard more focused for regular users */
+  div[class*="Dashboard_dashboard"] {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  /* Add a welcome message for regular users */
+  div[class*="Dashboard_dashboard"]::before {
+    content: "Welcome to your site management dashboard. Here you can manage all your content in one place.";
+    display: block;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    background-color: #ebf5ff;
+    border-left: 4px solid #3b82f6;
+    color: #1e40af;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+}
