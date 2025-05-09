@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.github
+media
+build
+dist/media
+docs
+tests
+**/*.test.js
+**/*.spec.js
