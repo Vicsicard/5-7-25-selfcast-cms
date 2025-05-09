@@ -12,7 +12,9 @@ import './styles/globals.css';
 
 export default buildConfig({
   // Add serverURL for proper URL generation in production
-  serverURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
+  serverURL: process.env.NODE_ENV === 'production' 
+    ? 'https://5-7-25-selfcast-cms.vercel.app'
+    : 'http://localhost:3000',
   
   // Configure CORS for security
   cors: process.env.NODE_ENV === 'production' 
