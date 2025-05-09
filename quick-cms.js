@@ -105,8 +105,8 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Start server - use port 3001 instead of 3000 to avoid conflicts
-const PORT = 3001;
+// Start server - use port 3003 to avoid conflicts
+const PORT = 3003;
 app.listen(PORT, () => {
   console.log(`
 =========================================

@@ -590,6 +590,7 @@ app.get('/login', (req, res) => {
 });
 
 // MongoDB connection - optimized for serverless
+const { ServerApiVersion } = require('mongodb');
 let cachedClient = null;
 let cachedDb = null;
 
@@ -598,44 +599,36 @@ async function connectToDatabase() {
     return { client: cachedClient, db: cachedDb };
   }
 
-  // Connection options optimized for serverless
-  const options = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    maxPoolSize: 10,
-    serverSelectionTimeoutMS: 5000,
-    socketTimeoutMS: 45000,
-    ssl: true,
-    tls: true,
-    tlsAllowInvalidCertificates: false,
-    retryWrites: true,
-    w: 'majority'
-  };
+  // Use the connection string format recommended by MongoDB Atlas
+  const uri = "mongodb+srv://vicsicard@gmail.com:Manniemae1993!@payloadonetorulethemall.9t4fnbt.mongodb.net/payload-cms?retryWrites=true&w=majority&appName=Payloadonetorulethemall";
   
   // Log connection attempt
   console.log('Attempting to connect to MongoDB...');
-  console.log('MongoDB URI format check:', process.env.MONGODB_URI ? 
-    process.env.MONGODB_URI.startsWith('mongodb+srv://') ? 'Valid format' : 'Invalid format' : 'Not set');
-
-  // Ensure MongoDB URI is properly formatted
-  let mongoUri = process.env.MONGODB_URI;
   
-  // Add connection options to URI if needed
-  if (mongoUri && !mongoUri.includes('retryWrites=')) {
-    const uriHasParams = mongoUri.includes('?');
-    mongoUri += `${uriHasParams ? '&' : '?'}retryWrites=true&w=majority`;
-  }
-  
-  console.log('Connecting to MongoDB with URI format:', mongoUri ? mongoUri.substring(0, mongoUri.indexOf('@') + 1) + '***' : 'Not set');
+  // Connection options recommended by MongoDB Atlas
+  const options = {
+    serverApi: {
+      version: ServerApiVersion.v1,
+      strict: true,
+      deprecationErrors: true,
+    }
+  };
   
   // Connect to database
-  const client = new MongoClient(mongoUri, options);
+  const client = new MongoClient(uri, options);
   await client.connect();
-  const db = client.db();
-
+  
+  // Determine database name from URI or use default
+  const dbName = 'payload-cms';
+  const db = client.db(dbName);
+  
   // Cache the connection
   cachedClient = client;
   cachedDb = db;
+  
+  // Test connection with ping
+  await db.command({ ping: 1 });
+  console.log("Successfully connected to MongoDB!");
 
   return { client, db };
 }
