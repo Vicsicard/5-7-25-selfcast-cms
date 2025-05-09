@@ -638,11 +638,12 @@ async function connectToDatabase() {
 app.get('/api/health', async (req, res) => {
   try {
     console.log('Health check requested');
-    console.log('MongoDB URI:', process.env.MONGODB_URI ? 'Set (length: ' + process.env.MONGODB_URI.length + ')' : 'Not set');
     
+    // Use the same connection approach as in connectToDatabase
     const { client, db } = await connectToDatabase();
     // Simple ping to verify connection
     await db.command({ ping: 1 });
+    console.log('Health check: MongoDB connection successful');
     
     res.json({ 
       status: 'ok', 
@@ -657,13 +658,25 @@ app.get('/api/health', async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (err) {
-    console.error('Database connection error:', err);
+    console.error('Health check error:', err);
+    
+    // Provide more detailed error information
+    let errorDetails = {
+      message: err.message,
+      type: err.name || 'Unknown',
+      code: err.code || 'None'
+    };
+    
+    // Only include stack trace in development
+    if (process.env.NODE_ENV === 'development') {
+      errorDetails.stack = err.stack;
+    }
+    
     res.json({ 
       status: 'error', 
       database: false, 
-      message: err.message,
-      stack: process.env.NODE_ENV === 'production' ? null : err.stack,
-      mongodbUri: process.env.MONGODB_URI ? 'Set (but may be invalid)' : 'Not set'
+      error: errorDetails,
+      timestamp: new Date().toISOString()
     });
   }
 });
