@@ -604,11 +604,32 @@ async function connectToDatabase() {
     useUnifiedTopology: true,
     maxPoolSize: 10,
     serverSelectionTimeoutMS: 5000,
-    socketTimeoutMS: 45000
+    socketTimeoutMS: 45000,
+    ssl: true,
+    tls: true,
+    tlsAllowInvalidCertificates: false,
+    retryWrites: true,
+    w: 'majority'
   };
+  
+  // Log connection attempt
+  console.log('Attempting to connect to MongoDB...');
+  console.log('MongoDB URI format check:', process.env.MONGODB_URI ? 
+    process.env.MONGODB_URI.startsWith('mongodb+srv://') ? 'Valid format' : 'Invalid format' : 'Not set');
 
+  // Ensure MongoDB URI is properly formatted
+  let mongoUri = process.env.MONGODB_URI;
+  
+  // Add connection options to URI if needed
+  if (mongoUri && !mongoUri.includes('retryWrites=')) {
+    const uriHasParams = mongoUri.includes('?');
+    mongoUri += `${uriHasParams ? '&' : '?'}retryWrites=true&w=majority`;
+  }
+  
+  console.log('Connecting to MongoDB with URI format:', mongoUri ? mongoUri.substring(0, mongoUri.indexOf('@') + 1) + '***' : 'Not set');
+  
   // Connect to database
-  const client = new MongoClient(process.env.MONGODB_URI, options);
+  const client = new MongoClient(mongoUri, options);
   await client.connect();
   const db = client.db();
 
