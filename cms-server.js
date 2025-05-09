@@ -601,7 +601,8 @@ async function connectToDatabase() {
 
   // Use the connection string format recommended by MongoDB Atlas
   // Note: mongodb+srv format cannot include port numbers
-  const uri = "mongodb+srv://vicsicard@gmail.com:Manniemae1993!@payloadonetorulethemall.9t4fnbt.mongodb.net/payload-cms?retryWrites=true&w=majority";
+  // URL encode the username (email) to avoid issues with @ symbol
+  const uri = "mongodb+srv://vicsicard%40gmail.com:Manniemae1993!@payloadonetorulethemall.9t4fnbt.mongodb.net/payload-cms?retryWrites=true&w=majority";
   
   // Log connection attempt
   console.log('Attempting to connect to MongoDB...');
