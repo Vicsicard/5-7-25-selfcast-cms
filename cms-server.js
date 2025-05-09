@@ -599,21 +599,30 @@ async function connectToDatabase() {
     return { client: cachedClient, db: cachedDb };
   }
 
-  // Use the connection string format recommended by MongoDB Atlas
-  // Note: mongodb+srv format cannot include port numbers
-  // URL encode the username (email) to avoid issues with @ symbol
-  const uri = "mongodb+srv://vicsicard%40gmail.com:Manniemae1993!@payloadonetorulethemall.9t4fnbt.mongodb.net/payload-cms?retryWrites=true&w=majority";
+  // Use direct connection string instead of SRV format to avoid SSL/TLS issues
+  // This format is more compatible with serverless environments
+  const uri = "mongodb://vicsicard%40gmail.com:Manniemae1993!@payloadonetorulethemall-shard-00-00.9t4fnbt.mongodb.net:27017,payloadonetorulethemall-shard-00-01.9t4fnbt.mongodb.net:27017,payloadonetorulethemall-shard-00-02.9t4fnbt.mongodb.net:27017/payload-cms?ssl=true&replicaSet=atlas-iqjqhj-shard-0&authSource=admin&retryWrites=true&w=majority";
+  
+  // Log the connection string format (without credentials)
+  console.log('Using connection format:', uri.substring(0, 10) + '...' + uri.substring(uri.indexOf('@')));
   
   // Log connection attempt
   console.log('Attempting to connect to MongoDB...');
   
-  // Connection options recommended by MongoDB Atlas
+  // Connection options optimized for Vercel and serverless environments
   const options = {
     serverApi: {
       version: ServerApiVersion.v1,
       strict: true,
       deprecationErrors: true,
-    }
+    },
+    ssl: true,
+    tlsAllowInvalidCertificates: false,
+    tlsAllowInvalidHostnames: false,
+    maxPoolSize: 10, // Limit connection pool size for serverless
+    socketTimeoutMS: 30000, // Reduce timeout for serverless functions
+    connectTimeoutMS: 30000,
+    serverSelectionTimeoutMS: 5000
   };
   
   // Connect to database
