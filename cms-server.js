@@ -589,12 +589,46 @@ app.get('/login', (req, res) => {
   `);
 });
 
+// MongoDB connection - optimized for serverless
+let cachedClient = null;
+let cachedDb = null;
+
+async function connectToDatabase() {
+  if (cachedClient && cachedDb) {
+    return { client: cachedClient, db: cachedDb };
+  }
+
+  // Connection options optimized for serverless
+  const options = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    maxPoolSize: 10,
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000
+  };
+
+  // Connect to database
+  const client = new MongoClient(process.env.MONGODB_URI, options);
+  await client.connect();
+  const db = client.db();
+
+  // Cache the connection
+  cachedClient = client;
+  cachedDb = db;
+
+  return { client, db };
+}
+
 // Health check endpoint
 app.get('/api/health', async (req, res) => {
-  let client;
   try {
-    client = new MongoClient(process.env.MONGODB_URI);
-    await client.connect();
+    console.log('Health check requested');
+    console.log('MongoDB URI:', process.env.MONGODB_URI ? 'Set (length: ' + process.env.MONGODB_URI.length + ')' : 'Not set');
+    
+    const { client, db } = await connectToDatabase();
+    // Simple ping to verify connection
+    await db.command({ ping: 1 });
+    
     res.json({ 
       status: 'ok', 
       database: true,
@@ -603,13 +637,19 @@ app.get('/api/health', async (req, res) => {
         email: req.user.email,
         role: req.user.role,
         name: req.user.name
-      } : null
+      } : null,
+      environment: process.env.NODE_ENV || 'development',
+      timestamp: new Date().toISOString()
     });
   } catch (err) {
     console.error('Database connection error:', err);
-    res.json({ status: 'error', database: false, message: err.message });
-  } finally {
-    if (client) await client.close();
+    res.json({ 
+      status: 'error', 
+      database: false, 
+      message: err.message,
+      stack: process.env.NODE_ENV === 'production' ? null : err.stack,
+      mongodbUri: process.env.MONGODB_URI ? 'Set (but may be invalid)' : 'Not set'
+    });
   }
 });
 
@@ -624,11 +664,8 @@ collections.forEach(collection => {
       return res.status(401).json({ error: 'Unauthorized - Please login' });
     }
     
-    let client;
     try {
-      client = new MongoClient(process.env.MONGODB_URI);
-      await client.connect();
-      const db = client.db();
+      const { client, db } = await connectToDatabase();
       
       let query = {};
       
@@ -648,8 +685,6 @@ collections.forEach(collection => {
     } catch (err) {
       console.error(`Error fetching ${collection}:`, err);
       res.status(500).json({ error: err.message });
-    } finally {
-      if (client) await client.close();
     }
   });
 });
