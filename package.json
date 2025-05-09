@@ -2,11 +2,13 @@
   "name": "payload-cms-project",
   "version": "1.0.0",
   "description": "PayloadCMS project for managing content migrated from Supabase",
-  "main": "cms-server.js",
+  "main": "src/server.js",
   "scripts": {
-    "dev": "node cms-server.js",
-    "start": "node cms-server.js",
-    "build:payload": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts payload build",
+    "dev": "node src/server.js",
+    "start": "node src/server.js",
+    "build": "payload build",
+    "vercel-build": "payload build",
+    "build:payload": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.js payload build",
     "setup-relationships": "node src/setup-relationships.js",
     "seed": "node src/scripts/seed.js",
     "test": "echo \"Error: no test specified\" && exit 1"

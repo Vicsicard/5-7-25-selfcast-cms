@@ -1,30 +1,54 @@
 # Self Cast Studios CMS
 
-This repository contains the Content Management System (CMS) for Self Cast Studios, providing a comprehensive admin interface for managing website content and API access to MongoDB data.
+This repository contains the Content Management System (CMS) for Self Cast Studios, built with PayloadCMS, providing a comprehensive admin interface for managing website content and API access to MongoDB data.
 
 ## Quick Start Guide
 
 To start the CMS server:
 
 ```bash
-cd C:\Users\digit\CascadeProjects\5-7-25-selfcast-cms
 npm install
-node cms-server.js
+npm run dev
 ```
 
 This will start the CMS on port 3000:
-- Admin Dashboard: http://localhost:3000
+- Admin Dashboard: http://localhost:3000/admin
 - API Endpoints: http://localhost:3000/api
-- Login: http://localhost:3000/login
+- Health Check: http://localhost:3000/api/health
 
 ## Project Structure
 
-- `cms-server.js` - Main CMS server that connects to MongoDB and provides the admin interface
-- `*-editor-route.js` - Route files for each page editor (home, about, blog, projects, social, contact, global)
-- `public/` - Public assets and client-side JavaScript
-  - `js/` - Client-side JavaScript for each editor
+- `src/` - Main PayloadCMS application
+  - `server.js` - PayloadCMS server entry point
+  - `payload.config.js` - PayloadCMS configuration
+  - `collections/` - Collection definitions for MongoDB
+- `public/` - Public assets and static files
   - `uploads/` - Uploaded files (logos, images, etc.)
-- `node_modules/` - Node.js dependencies
+- `vercel.json` - Vercel deployment configuration
+
+## Deployment to Vercel
+
+This project is configured for deployment on Vercel. The following environment variables must be set in your Vercel project:
+
+- `MONGODB_URI` - MongoDB connection string
+- `PAYLOAD_SECRET` - Secret key for JWT authentication
+- `NEXT_PUBLIC_API_URL` - URL for the API (e.g., https://your-project.vercel.app/api)
+
+### Deployment Steps
+
+1. Push your changes to GitHub
+2. Connect your GitHub repository to Vercel
+3. Configure the environment variables in the Vercel dashboard
+4. Deploy the project
+
+### Troubleshooting MongoDB Connection
+
+If you encounter MongoDB connection issues in Vercel:
+
+1. Ensure your MongoDB Atlas cluster allows connections from anywhere (IP: 0.0.0.0/0)
+2. Verify the MongoDB connection string is correctly formatted
+3. Check the health endpoint at `/api/health` for detailed diagnostics
+4. Review Vercel logs for any connection errors
 
 ## Features
 

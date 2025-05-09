@@ -5,13 +5,8 @@ require('dotenv').config();
 // Create Express app
 const app = express();
 
-// Allow payload to handle CORS
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
-  next();
-});
+// Allow payload to handle CORS - this will be handled by the Payload config
+// We don't need to manually set CORS headers here
 
 // Redirect root to Admin panel
 app.get('/', (_, res) => {
@@ -22,23 +17,38 @@ app.get('/', (_, res) => {
 const start = async () => {
   // Initialize Payload
   await payload.init({
-    secret: process.env.PAYLOAD_SECRET || 'selfcast-studios-secret-key',
+    secret: process.env.PAYLOAD_SECRET,
     mongoURL: process.env.MONGODB_URI,
     express: app,
     email: {
       fromName: 'Self Cast Studios',
       fromAddress: 'noreply@selfcaststudios.com',
     },
+    // Optimize for serverless environment
+    rateLimit: {
+      window: 5 * 60 * 1000, // 5 minutes
+      max: 100, // limit each IP to 100 requests per window
+    },
+    maxDepth: 10, // Prevent excessive query depth
+    graphQL: {
+      maxComplexity: 1000, // Limit GraphQL query complexity
+      disablePlaygroundInProduction: true,
+    },
+    // Log initialization
     onInit: async () => {
       payload.logger.info(`Payload Admin URL: ${payload.getAdminURL()}`);
+      payload.logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
     },
   });
 
-  // Start server
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    payload.logger.info(`Server started on http://localhost:${PORT}`);
-  });
+  // In production (Vercel), we don't need to start a server
+  // Vercel will handle the serverless function execution
+  if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+      payload.logger.info(`Server started on http://localhost:${PORT}`);
+    });
+  }
 };
 
 start();

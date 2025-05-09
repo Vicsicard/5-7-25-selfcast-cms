@@ -2,34 +2,55 @@
   "version": 2,
   "builds": [
     {
-      "src": "cms-server.js",
-      "use": "@vercel/node"
+      "src": "src/server.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["**/*"],
+        "maxLambdaSize": "50mb"
+      }
     }
   ],
   "routes": [
     {
+      "src": "/api/health",
+      "dest": "/src/server.js",
+      "headers": {
+        "cache-control": "no-cache, no-store, must-revalidate"
+      }
+    },
+    {
       "src": "/api/(.*)",
-      "dest": "/cms-server.js"
+      "dest": "/src/server.js",
+      "headers": {
+        "cache-control": "s-maxage=0"
+      }
+    },
+    {
+      "src": "/admin(.*)",
+      "dest": "/src/server.js"
     },
     {
       "src": "/login",
-      "dest": "/cms-server.js"
+      "dest": "/src/server.js"
     },
     {
       "src": "/logout",
-      "dest": "/cms-server.js"
+      "dest": "/src/server.js"
     },
     {
-      "src": "/manage-clients",
-      "dest": "/cms-server.js"
+      "src": "/favicon.ico",
+      "dest": "/public/favicon.ico"
     },
     {
-      "src": "/editor/(.*)",
-      "dest": "/cms-server.js"
+      "src": "/public/(.*)",
+      "dest": "/public/$1",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      }
     },
     {
       "src": "/(.*)",
-      "dest": "/cms-server.js"
+      "dest": "/src/server.js"
     }
   ]
 }
