@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "cms-server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/cms-server.js"
+    },
+    {
+      "src": "/login",
+      "dest": "/cms-server.js"
+    },
+    {
+      "src": "/logout",
+      "dest": "/cms-server.js"
+    },
+    {
+      "src": "/manage-clients",
+      "dest": "/cms-server.js"
+    },
+    {
+      "src": "/editor/(.*)",
+      "dest": "/cms-server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/cms-server.js"
+    }
+  ]
+}

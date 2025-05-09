@@ -2,10 +2,10 @@
   "name": "payload-cms-project",
   "version": "1.0.0",
   "description": "PayloadCMS project for managing content migrated from Supabase",
-  "main": "src/server.js",
+  "main": "cms-server.js",
   "scripts": {
-    "dev": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.js node src/server.js",
-    "start": "node src/server.js",
+    "dev": "node cms-server.js",
+    "start": "node cms-server.js",
     "build:payload": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts payload build",
     "setup-relationships": "node src/setup-relationships.js",
     "seed": "node src/scripts/seed.js",

@@ -654,10 +654,11 @@ collections.forEach(collection => {
   });
 });
 
-// Start server
-const PORT = process.env.PORT || 3005;
-app.listen(PORT, () => {
-  console.log(`
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 3005;
+  app.listen(PORT, () => {
+    console.log(`
 =========================================
 ✅ Self Cast Studios CMS is running!
 =========================================
@@ -669,5 +670,9 @@ Admin credentials:
 Email: ${ADMIN_EMAIL}
 Password: ${ADMIN_PASSWORD}
 =========================================
-  `);
-});
+    `);
+  });
+}
+
+// Export for Vercel serverless deployment
+module.exports = app;
