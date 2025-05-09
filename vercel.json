@@ -5,8 +5,8 @@
       "src": "src/server.ts",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["dist/**"],
-        "excludeFiles": ["**/node_modules/**", "dist/media/**"],
+        "includeFiles": "dist/**",
+        "excludeFiles": "(**/node_modules/**|dist/media/**)",
         "maxLambdaSize": "50mb"
       }
     }
@@ -56,8 +56,8 @@
   ],
   "functions": {
     "src/server.ts": {
-      "includeFiles": ["dist/**/*"],
-      "excludeFiles": ["dist/media/**", "**/node_modules/**"],
+      "includeFiles": "dist/**/*",
+      "excludeFiles": "(dist/media/**|**/node_modules/**)",
       "memory": 1024,
       "maxDuration": 10
     }
