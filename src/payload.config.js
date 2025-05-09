@@ -5,12 +5,12 @@ const { slateEditor } = require('@payloadcms/richtext-slate');
 const path = require('path');
 
 // Import collections
-const Sites = require('./collections/Sites');
-const BlogPosts = require('./collections/BlogPosts');
-const SocialPosts = require('./collections/SocialPosts');
-const BioCards = require('./collections/BioCards');
-const Quotes = require('./collections/Quotes');
-const Media = require('./collections/Media');
+const Sites = require('./collections/Sites.ts');
+const BlogPosts = require('./collections/BlogPosts.ts');
+const SocialPosts = require('./collections/SocialPosts.ts');
+const BioCards = require('./collections/BioCards.ts');
+const Quotes = require('./collections/Quotes.ts');
+const Media = require('./collections/Media.ts');
 
 // Import css
 require('./styles/globals.css');

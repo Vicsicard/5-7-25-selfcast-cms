@@ -589,93 +589,154 @@ app.get('/login', (req, res) => {
   `);
 });
 
-// MongoDB connection - optimized for serverless
+// MongoDB connection - simplified for serverless environments
 const { ServerApiVersion } = require('mongodb');
+
+// Use connection pooling with caching for serverless functions
 let cachedClient = null;
 let cachedDb = null;
 
 async function connectToDatabase() {
+  // Return cached connection if available
   if (cachedClient && cachedDb) {
+    console.log('Using cached database connection');
     return { client: cachedClient, db: cachedDb };
   }
 
-  // Use direct connection string instead of SRV format to avoid SSL/TLS issues
-  // This format is more compatible with serverless environments
-  const uri = "mongodb://vicsicard%40gmail.com:Manniemae1993!@payloadonetorulethemall-shard-00-00.9t4fnbt.mongodb.net:27017,payloadonetorulethemall-shard-00-01.9t4fnbt.mongodb.net:27017,payloadonetorulethemall-shard-00-02.9t4fnbt.mongodb.net:27017/payload-cms?ssl=true&replicaSet=atlas-iqjqhj-shard-0&authSource=admin&retryWrites=true&w=majority";
+  console.log('Creating new database connection');
   
-  // Log the connection string format (without credentials)
-  console.log('Using connection format:', uri.substring(0, 10) + '...' + uri.substring(uri.indexOf('@')));
-  
-  // Log connection attempt
-  console.log('Attempting to connect to MongoDB...');
-  
-  // Connection options optimized for Vercel and serverless environments
-  const options = {
-    serverApi: {
-      version: ServerApiVersion.v1,
-      strict: true,
-      deprecationErrors: true,
-    },
-    ssl: true,
-    tlsAllowInvalidCertificates: false,
-    tlsAllowInvalidHostnames: false,
-    maxPoolSize: 10, // Limit connection pool size for serverless
-    socketTimeoutMS: 30000, // Reduce timeout for serverless functions
-    connectTimeoutMS: 30000,
-    serverSelectionTimeoutMS: 5000
-  };
-  
-  // Connect to database
-  const client = new MongoClient(uri, options);
-  await client.connect();
-  
-  // Determine database name from URI or use default
-  const dbName = 'payload-cms';
-  const db = client.db(dbName);
-  
-  // Cache the connection
-  cachedClient = client;
-  cachedDb = db;
-  
-  // Test connection with ping
-  await db.command({ ping: 1 });
-  console.log("Successfully connected to MongoDB!");
-
-  return { client, db };
+  try {
+    // Use environment variable for connection string
+    // This allows for easier configuration changes in Vercel
+    const uri = process.env.MONGODB_URI;
+    
+    if (!uri) {
+      throw new Error('MONGODB_URI environment variable is not set');
+    }
+    
+    // Log connection attempt (without credentials)
+    const sanitizedUri = uri.includes('@') 
+      ? uri.substring(0, uri.indexOf('://') + 3) + '***:***@' + uri.substring(uri.indexOf('@') + 1)
+      : 'mongodb://***:***@example.com';
+    console.log('Connecting to MongoDB:', sanitizedUri);
+    
+    // Minimal connection options for reliability
+    const options = {
+      serverApi: { version: ServerApiVersion.v1 },
+      maxPoolSize: 1, // Minimize connections for serverless
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 30000
+    };
+    
+    // Connect to database
+    const client = new MongoClient(uri, options);
+    await client.connect();
+    
+    // Extract database name from URI or use default
+    let dbName = 'payload-cms';
+    if (uri.includes('?')) {
+      const uriParts = uri.split('?')[0].split('/');
+      if (uriParts.length > 0 && uriParts[uriParts.length - 1]) {
+        dbName = uriParts[uriParts.length - 1];
+      }
+    }
+    
+    const db = client.db(dbName);
+    
+    // Verify connection with a ping
+    await db.command({ ping: 1 });
+    console.log('Successfully connected to MongoDB!');
+    
+    // Cache connection
+    cachedClient = client;
+    cachedDb = db;
+    
+    return { client, db };
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    throw error;
+  }
 }
 
-// Health check endpoint
+// Health check endpoint with comprehensive diagnostics
 app.get('/api/health', async (req, res) => {
+  console.log('Health check requested from:', req.ip);
+  
+  // Collect environment information
+  const envInfo = {
+    nodeEnv: process.env.NODE_ENV || 'development',
+    nodeVersion: process.version,
+    platform: process.platform,
+    mongodbUriSet: !!process.env.MONGODB_URI,
+    payloadSecretSet: !!process.env.PAYLOAD_SECRET,
+    apiUrlSet: !!process.env.NEXT_PUBLIC_API_URL
+  };
+  
+  console.log('Environment info:', envInfo);
+  
   try {
-    console.log('Health check requested');
-    
-    // Use the same connection approach as in connectToDatabase
+    // Attempt database connection
+    console.log('Attempting database connection for health check...');
+    const startTime = Date.now();
     const { client, db } = await connectToDatabase();
-    // Simple ping to verify connection
+    
+    // Verify connection with ping
     await db.command({ ping: 1 });
-    console.log('Health check: MongoDB connection successful');
+    const connectionTime = Date.now() - startTime;
+    console.log(`Health check: MongoDB connection successful (${connectionTime}ms)`);
+    
+    // Get database stats for additional diagnostics
+    const dbStats = await db.stats();
     
     res.json({ 
       status: 'ok', 
-      database: true,
-      authenticated: !!req.user,
-      user: req.user ? { 
-        email: req.user.email,
-        role: req.user.role,
-        name: req.user.name
-      } : null,
-      environment: process.env.NODE_ENV || 'development',
-      timestamp: new Date().toISOString()
+      database: {
+        connected: true,
+        connectionTimeMs: connectionTime,
+        collections: dbStats.collections,
+        dbSize: dbStats.dataSize,
+        engine: dbStats.storageEngine?.name || 'unknown'
+      },
+      auth: {
+        authenticated: !!req.user,
+        user: req.user ? { 
+          email: req.user.email,
+          role: req.user.role
+        } : null
+      },
+      environment: envInfo,
+      timestamp: new Date().toISOString(),
+      serverTime: new Date().toISOString(),
+      uptime: process.uptime()
     });
   } catch (err) {
     console.error('Health check error:', err);
     
-    // Provide more detailed error information
-    let errorDetails = {
+    // Provide comprehensive error diagnostics
+    const errorDetails = {
       message: err.message,
       type: err.name || 'Unknown',
-      code: err.code || 'None'
+      code: err.code || 'None',
+      codeName: err.codeName || 'None'
     };
+    
+    // Add connection-specific error details
+    if (err.name === 'MongoServerSelectionError') {
+      errorDetails.reason = 'Failed to select a MongoDB server';
+      errorDetails.possibleCauses = [
+        'Network connectivity issues',
+        'Firewall blocking connection',
+        'MongoDB Atlas IP whitelist restrictions',
+        'Incorrect connection string'
+      ];
+    } else if (err.name === 'MongoParseError') {
+      errorDetails.reason = 'Failed to parse MongoDB connection string';
+      errorDetails.possibleCauses = [
+        'Malformed connection string',
+        'Invalid characters in username/password',
+        'Missing required connection string components'
+      ];
+    }
     
     // Only include stack trace in development
     if (process.env.NODE_ENV === 'development') {
@@ -684,9 +745,12 @@ app.get('/api/health', async (req, res) => {
     
     res.json({ 
       status: 'error', 
-      database: false, 
+      database: { connected: false },
       error: errorDetails,
-      timestamp: new Date().toISOString()
+      environment: envInfo,
+      timestamp: new Date().toISOString(),
+      serverTime: new Date().toISOString(),
+      uptime: process.uptime()
     });
   }
 });
