@@ -55,8 +55,9 @@ const handler = async (req, res) => {
       });
 
       try {
-        // Use the proper config file instead of inline configuration
-        console.log('Initializing with payload.config.js');
+        // Load config from file
+        console.log('Loading config from payload.config.js');
+        const payloadConfig = require('../payload.config.js');
         
         // Add comprehensive MongoDB connection logging
         if (process.env.MONGODB_URI) {
@@ -70,12 +71,15 @@ const handler = async (req, res) => {
           console.error('MONGODB_URI is not defined in environment variables!');
         }
         
-        // Initialize with the root config file
+        // Initialize Payload for serverless (important: disable admin UI in serverless)
         await payload.init({
           express: app,
           // Use explicit secret and mongoURL to override config file if needed
           secret: process.env.PAYLOAD_SECRET || 'selfcast-studios-secret-key',
           mongoURL: process.env.MONGODB_URI,
+          config: payloadConfig,
+          // Critical: Disable admin UI in serverless environment to avoid the 'serve' error
+          disableAdmin: process.env.NODE_ENV === 'production',
           onInit: () => {
             console.log('Payload initialized successfully!');
           },
