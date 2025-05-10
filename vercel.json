@@ -1,31 +1,41 @@
 {
   "version": 2,
+  "builds": [
+    {
+      "src": "src/server.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": "dist/**",
+        "maxLambdaSize": "50mb"
+      }
+    }
+  ],
   "routes": [
     {
       "src": "/api/health",
-      "dest": "/src/server.ts",
+      "dest": "/src/server.js",
       "headers": {
         "cache-control": "no-cache, no-store, must-revalidate"
       }
     },
     {
       "src": "/api/(.*)",
-      "dest": "/src/server.ts",
+      "dest": "/src/server.js",
       "headers": {
         "cache-control": "s-maxage=0"
       }
     },
     {
       "src": "/admin(.*)",
-      "dest": "/src/server.ts"
+      "dest": "/src/server.js"
     },
     {
       "src": "/login",
-      "dest": "/src/server.ts"
+      "dest": "/src/server.js"
     },
     {
       "src": "/logout",
-      "dest": "/src/server.ts"
+      "dest": "/src/server.js"
     },
     {
       "src": "/favicon.ico",
@@ -40,15 +50,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/src/server.ts"
+      "dest": "/src/server.js"
     }
-  ],
-  "functions": {
-    "src/server.ts": {
-      "includeFiles": "dist/**/*",
-      "excludeFiles": "dist/media/**,**/node_modules/**",
-      "memory": 1024,
-      "maxDuration": 10
-    }
-  }
+  ]
 }
