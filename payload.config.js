@@ -26,14 +26,21 @@ const config = buildConfig({
     },
   },
   
-  // Configure MongoDB adapter
+  // Configure MongoDB adapter with enhanced options for serverless
   db: mongooseAdapter({
     url: process.env.MONGODB_URI,
     connectOptions: {
-      // Recommended options for serverless environments
-      maxPoolSize: 10, // Limit connections for serverless
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 30000,
+      // Enhanced options for Vercel serverless environments
+      maxPoolSize: 10,
+      minPoolSize: 1,
+      serverSelectionTimeoutMS: 15000, // Allow more time for selection
+      socketTimeoutMS: 45000, // Increase socket timeout
+      connectTimeoutMS: 10000, // Set explicit connect timeout
+      retryWrites: true,
+      retryReads: true,
+      // Prevent 'topology destroyed' errors in serverless
+      keepAlive: true,
+      keepAliveInitialDelay: 300000,
     },
   }),
   

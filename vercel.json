@@ -5,8 +5,19 @@
   ],
   "functions": {
     "api/index.js": {
-      "memory": 1024,
-      "maxDuration": 10
+      "memory": 1536,
+      "maxDuration": 20
     }
+  },
+  "build": {
+    "env": {
+      "PAYLOAD_CONFIG_PATH": "payload.config.js"
+    }
+  },
+  "env": {
+    "MONGODB_URI": "@mongodb-uri",
+    "PAYLOAD_SECRET": "@payload-secret",
+    "NEXT_PUBLIC_API_URL": "https://5-7-25-selfcast-cms.vercel.app/api",
+    "PAYLOAD_PUBLIC_SERVER_URL": "https://5-7-25-selfcast-cms.vercel.app"
   }
 }

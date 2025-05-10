@@ -1,6 +1,6 @@
 // CMS Server with Homepage Editor
 const express = require('express');
-const { MongoClient, ObjectId } = require('mongodb');
+const { MongoClient, ObjectId, ServerApiVersion } = require('mongodb');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const cookieParser = require('cookie-parser');
@@ -620,12 +620,16 @@ async function connectToDatabase() {
       : 'mongodb://***:***@example.com';
     console.log('Connecting to MongoDB:', sanitizedUri);
     
-    // Minimal connection options for reliability
+    // Enhanced connection options for better reliability
     const options = {
       serverApi: { version: ServerApiVersion.v1 },
-      maxPoolSize: 1, // Minimize connections for serverless
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 30000
+      maxPoolSize: 10,
+      minPoolSize: 1,
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      connectTimeoutMS: 10000,
+      retryWrites: true,
+      retryReads: true
     };
     
     // Connect to database
@@ -653,7 +657,22 @@ async function connectToDatabase() {
     
     return { client, db };
   } catch (error) {
-    console.error('MongoDB connection error:', error);
+    console.error('=== MongoDB Connection Error Details ===');
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    if (error.code) console.error('Error code:', error.code);
+    if (error.codeName) console.error('Error codeName:', error.codeName);
+    
+    // Log connectionString details (but not credentials)
+    if (process.env.DEBUG_MONGODB === 'true') {
+      const uri = process.env.MONGODB_URI || '';
+      console.error('MongoDB URI format check:');
+      console.error('- Has protocol:', uri.startsWith('mongodb://') || uri.startsWith('mongodb+srv://'));
+      console.error('- Contains username:', uri.includes('@'));
+      console.error('- Contains database name:', uri.includes('/') && uri.split('/').length > 3);
+      console.error('- Contains options:', uri.includes('?'));
+    }
+    
     throw error;
   }
 }

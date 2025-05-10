@@ -55,30 +55,27 @@ const handler = async (req, res) => {
       });
 
       try {
-        // Attempt to initialize with minimal config to avoid TS config issues
-        console.log('Initializing with inline config');
+        // Use the proper config file instead of inline configuration
+        console.log('Initializing with payload.config.js');
+        
+        // Add comprehensive MongoDB connection logging
+        if (process.env.MONGODB_URI) {
+          const sanitizedUri = process.env.MONGODB_URI.includes('@') 
+            ? process.env.MONGODB_URI.substring(0, process.env.MONGODB_URI.indexOf('://') + 3) + 
+              '***:***@' + process.env.MONGODB_URI.substring(process.env.MONGODB_URI.indexOf('@') + 1)
+            : 'mongodb://***:***@example.com';
+          console.log('MongoDB URI format:', sanitizedUri);
+          console.log('MongoDB connection test: starting');
+        } else {
+          console.error('MONGODB_URI is not defined in environment variables!');
+        }
+        
+        // Initialize with the root config file
         await payload.init({
-          secret: process.env.PAYLOAD_SECRET || 'fallback-secret-for-testing',
-          mongoURL: process.env.MONGODB_URI,
           express: app,
-          email: {
-            fromName: 'Self Cast Studios',
-            fromAddress: 'noreply@selfcaststudios.com',
-          },
-          // Minimal collections setup
-          collections: [
-            {
-              slug: 'users',
-              auth: true,
-              admin: { useAsTitle: 'email' },
-              fields: [{ name: 'email', type: 'email', required: true }]
-            },
-            {
-              slug: 'media',
-              upload: { staticDir: 'media' },
-              fields: []
-            }
-          ],
+          // Use explicit secret and mongoURL to override config file if needed
+          secret: process.env.PAYLOAD_SECRET || 'selfcast-studios-secret-key',
+          mongoURL: process.env.MONGODB_URI,
           onInit: () => {
             console.log('Payload initialized successfully!');
           },
