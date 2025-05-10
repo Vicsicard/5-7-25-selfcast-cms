@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: selfcast-cms-admin
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node src/server.js
+    envVars:
+      - key: MONGODB_URI
+        value: mongodb+srv://Testuser:Testing123456@payloadonetorulethemall.9t4fnbt.mongodb.net/payload-cms?retryWrites=true&w=majority&appName=Payloadonetorulethemall
+      - key: PAYLOAD_SECRET
+        value: selfcast-studios-7af51d0c-ac48-4845-a41a
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        value: https://selfcast-cms-admin.onrender.com/api
+      - key: PAYLOAD_PUBLIC_SERVER_URL
+        value: https://selfcast-cms-admin.onrender.com
+    autoDeploy: true
