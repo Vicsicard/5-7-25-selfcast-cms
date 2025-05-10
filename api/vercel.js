@@ -18,7 +18,8 @@ const createConfig = () => {
   console.log('Creating inline Payload config for serverless environment');
   return buildConfig({
     serverURL: process.env.NEXT_PUBLIC_API_URL || 'https://5-7-25-selfcast-cms.vercel.app',
-    admin: false, // Completely disable admin in serverless
+    // Set admin to null or an empty object instead of false
+    admin: null,
     collections: [
       // Minimal users collection
       {
