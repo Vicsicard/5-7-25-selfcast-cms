@@ -57,7 +57,7 @@
   "functions": {
     "src/server.ts": {
       "includeFiles": "dist/**/*",
-      "excludeFiles": "(dist/media/**|**/node_modules/**)",
+      "excludeFiles": "dist/media/**,**/node_modules/**",
       "memory": 1024,
       "maxDuration": 10
     }
