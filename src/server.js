@@ -21,6 +21,72 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Create a diagnostic page for troubleshooting
+app.get('/diagnostics', (req, res) => {
+  // Get information about the server environment
+  const diagnosticInfo = {
+    nodeEnv: process.env.NODE_ENV || 'not set',
+    port: process.env.PORT || '3000',
+    payloadSecret: process.env.PAYLOAD_SECRET ? 'set' : 'not set',
+    mongodbUri: process.env.MONGODB_URI ? 'set' : 'not set',
+    serverUrl: process.env.SERVER_URL || 'not set',
+    dirname: __dirname,
+    cwd: process.cwd(),
+    nodeVersion: process.version,
+    memoryUsage: process.memoryUsage(),
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString()
+  };
+  
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Payload CMS Diagnostics</title>
+        <style>
+          body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+          h1 { color: #333; }
+          pre { background: #f5f5f5; padding: 15px; border-radius: 5px; overflow-x: auto; }
+          .links { margin: 20px 0; }
+          .links a { display: inline-block; margin-right: 15px; }
+          .section { margin-bottom: 30px; }
+        </style>
+      </head>
+      <body>
+        <h1>Payload CMS Diagnostics</h1>
+        
+        <div class="section">
+          <h2>Environment Information</h2>
+          <pre>${JSON.stringify(diagnosticInfo, null, 2)}</pre>
+        </div>
+        
+        <div class="section">
+          <h2>Test Links</h2>
+          <div class="links">
+            <a href="/">Home</a>
+            <a href="/admin">Admin Panel</a>
+            <a href="/admin/">Admin Panel (with trailing slash)</a>
+            <a href="/api/globals">API Globals</a>
+            <a href="/api/test">API Test</a>
+            <a href="/health">Health Check</a>
+          </div>
+        </div>
+        
+        <div class="section">
+          <h2>Admin Panel Troubleshooting</h2>
+          <p>If you're having trouble accessing the admin panel, try these steps:</p>
+          <ol>
+            <li>Check that MongoDB is properly connected</li>
+            <li>Verify that the Payload CMS build completed successfully</li>
+            <li>Try accessing the admin panel with and without a trailing slash</li>
+            <li>Clear your browser cache or try a different browser</li>
+          </ol>
+        </div>
+      </body>
+    </html>
+  `);
+});
+
 // Start the server
 const start = async () => {
   // Initialize Payload
@@ -43,9 +109,9 @@ const start = async () => {
     });
   });
   
-  // Redirect root to Admin panel
+  // Redirect root to diagnostics page
   app.get('/', (_, res) => {
-    res.redirect('/admin');
+    res.redirect('/diagnostics');
   });
   
   // Serve static files from the public directory
