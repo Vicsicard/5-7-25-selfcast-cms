@@ -1,16 +1,28 @@
 const express = require('express');
 const payload = require('payload');
+const path = require('path');
 require('dotenv').config();
 
 // Create Express app
 const app = express();
 
-// Allow payload to handle CORS - this will be handled by the Payload config
-// We don't need to manually set CORS headers here
+// Add middleware to log all requests
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
 
 // Redirect root to Admin panel
 app.get('/', (_, res) => {
   res.redirect('/admin');
+});
+
+// Add a catch-all route handler for debugging
+app.use((req, res, next) => {
+  if (req.path.startsWith('/admin') || req.path.startsWith('/api')) {
+    return next();
+  }
+  res.status(404).send(`Route not found: ${req.path}`);
 });
 
 // Start the server
