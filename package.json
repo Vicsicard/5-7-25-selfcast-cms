@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "PayloadCMS project for managing content migrated from Supabase",
   "main": "src/server.js",
+  "type": "commonjs",
   "scripts": {
     "dev": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts nodemon",
     "build": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts payload build && node build.js",
@@ -32,6 +33,10 @@
     "payload": "^2.11.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.27.1",
+    "@babel/plugin-transform-runtime": "^7.27.1",
+    "@babel/preset-env": "^7.27.2",
+    "@babel/preset-typescript": "^7.27.1",
     "@types/axios": "^0.14.4",
     "@types/express": "^5.0.1",
     "@types/node": "^22.15.10",
