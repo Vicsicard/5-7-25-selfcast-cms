@@ -1,4 +1,4 @@
-# Self Cast Studios CMS
+   # Self Cast Studios CMS
 
 This repository contains the Content Management System (CMS) for Self Cast Studios, built with PayloadCMS, providing a comprehensive admin interface for managing website content and API access to MongoDB data.
 
