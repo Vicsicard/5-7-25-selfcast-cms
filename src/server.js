@@ -2,6 +2,7 @@ const express = require('express');
 const payload = require('payload');
 const path = require('path');
 const cors = require('cors');
+const { resolve } = require('path');
 require('dotenv').config();
 
 // Create Express app
@@ -9,6 +10,9 @@ const app = express();
 
 // Enable CORS for all routes
 app.use(cors());
+
+// Serve static files from the public directory
+app.use(express.static(path.resolve(__dirname, 'public')));
 
 // Add middleware to log all requests
 app.use((req, res, next) => {
@@ -63,15 +67,27 @@ const start = async () => {
     });
   });
   
-  // Explicitly serve admin routes
-  app.get('/admin*', (req, res, next) => {
-    console.log(`Admin route accessed: ${req.url}`);
-    next(); // Let Payload handle it
-  });
-  
   // Redirect root to Admin panel
   app.get('/', (_, res) => {
     res.redirect('/admin');
+  });
+  
+    // Let Payload handle all admin routes by default
+  // No need for explicit admin route handling
+  
+  // Add a catch-all route handler for any undefined routes
+  app.use((req, res, next) => {
+    // Let Payload handle its routes
+    if (req.url.startsWith('/admin') || req.url.startsWith('/api')) {
+      return next();
+    }
+    
+    // For non-Payload routes, serve the index.html
+    if (req.method === 'GET') {
+      return res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+    }
+    
+    next();
   });
   
   // Always start the server for both development and production
