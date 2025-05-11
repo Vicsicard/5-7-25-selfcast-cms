@@ -41,14 +41,12 @@ const start = async () => {
     },
   });
 
-  // In production (Vercel), we don't need to start a server
-  // Vercel will handle the serverless function execution
-  if (process.env.NODE_ENV !== 'production') {
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-      payload.logger.info(`Server started on http://localhost:${PORT}`);
-    });
-  }
+  // Always start the server for both development and production
+  // Use the PORT environment variable provided by Render
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    payload.logger.info(`Server started on port ${PORT}`);
+  });
 };
 
 start();
