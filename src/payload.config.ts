@@ -24,16 +24,6 @@ import UserSelector from './components/UserSelector';
 export default buildConfig({
   // Set the server URL to the Render deployment URL
   serverURL: process.env.SERVER_URL || 'https://selfcast-cms-admin.onrender.com',
-  
-  // Explicitly configure routes with trailing slashes
-  routes: {
-    admin: '/admin/',
-    api: '/api',
-    graphQL: '/api/graphql',
-  },
-  
-  // Set cookie options for better security and compatibility
-  cookiePrefix: 'payload',
   admin: {
     user: 'users',
     bundler: webpackBundler(),
