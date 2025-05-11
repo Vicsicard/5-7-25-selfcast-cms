@@ -66,10 +66,17 @@ app.get('/diagnostics', (req, res) => {
             <a href="/">Home</a>
             <a href="/admin">Admin Panel</a>
             <a href="/admin/">Admin Panel (with trailing slash)</a>
+            <a href="/admin-direct">Admin Panel (Direct Route)</a>
             <a href="/api/globals">API Globals</a>
             <a href="/api/test">API Test</a>
             <a href="/health">Health Check</a>
           </div>
+        </div>
+        
+        <div class="section">
+          <h2>Admin Panel Status</h2>
+          <p>The admin panel should be accessible at: <code>${process.env.SERVER_URL}/admin/</code></p>
+          <p>If you're having trouble accessing it, try the "Admin Panel (Direct Route)" link above.</p>
         </div>
         
         <div class="section">
@@ -89,6 +96,12 @@ app.get('/diagnostics', (req, res) => {
 
 // Start the server
 const start = async () => {
+  // Set SERVER_URL environment variable if not set
+  if (!process.env.SERVER_URL) {
+    process.env.SERVER_URL = 'https://selfcast-cms-admin.onrender.com';
+    console.log(`Setting SERVER_URL to ${process.env.SERVER_URL}`);
+  }
+
   // Initialize Payload
   await payload.init({
     secret: process.env.PAYLOAD_SECRET,
@@ -97,6 +110,7 @@ const start = async () => {
     onInit: async () => {
       payload.logger.info(`Payload Admin URL: ${payload.getAdminURL()}`);
       payload.logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      payload.logger.info(`Server URL: ${process.env.SERVER_URL}`);
     },
   });
   
@@ -107,6 +121,25 @@ const start = async () => {
       message: 'API is working correctly',
       timestamp: new Date().toISOString()
     });
+  });
+  
+  // Add a direct route to the admin panel
+  app.get('/admin-direct', (req, res) => {
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Admin Panel Redirect</title>
+          <meta http-equiv="refresh" content="0;url=${process.env.SERVER_URL}/admin/" />
+        </head>
+        <body>
+          <p>Redirecting to admin panel...</p>
+          <script>
+            window.location.href = '${process.env.SERVER_URL}/admin/';
+          </script>
+        </body>
+      </html>
+    `);
   });
   
   // Redirect root to diagnostics page
