@@ -1,16 +1,17 @@
 /**
- * This is a minimal server setup for Payload CMS
- * Following best practices for middleware order and configuration
+ * Standard Payload CMS Server Configuration
+ * Based on official examples for production deployments
  */
 
 const express = require('express');
 const payload = require('payload');
+const path = require('path');
 require('dotenv').config();
 
 // Create Express app
 const app = express();
 
-// Add health check endpoint before Payload initialization
+// Health check endpoint (before Payload initialization)
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
@@ -23,15 +24,11 @@ const start = async () => {
     console.log(`Setting SERVER_URL to ${process.env.SERVER_URL}`);
   }
 
-  // Initialize Payload with minimal configuration
+  // Initialize Payload
   await payload.init({
     secret: process.env.PAYLOAD_SECRET,
     mongoURL: process.env.MONGODB_URI,
     express: app,
-    onInit: () => {
-      payload.logger.info(`Payload CMS initialized successfully`);
-      payload.logger.info(`Admin URL: ${process.env.SERVER_URL}/admin`);
-    },
   });
 
   // Add a simple test API endpoint
@@ -43,16 +40,21 @@ const start = async () => {
     });
   });
 
+  // Serve static admin assets
+  const adminDir = path.resolve(__dirname, '../build/admin');
+  app.use('/admin', express.static(adminDir));
+
   // Redirect root to admin panel
   app.get('/', (_, res) => {
     res.redirect('/admin');
   });
 
-  // Start the server
+  // Bind to the port specified by Render
   const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    payload.logger.info(`Server started on port ${PORT}`);
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server listening on port ${PORT}`);
   });
 };
 
+// Start the server
 start();
