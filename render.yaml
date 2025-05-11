@@ -20,4 +20,6 @@ services:
         value: https://selfcast-cms-admin.onrender.com/api
       - key: PAYLOAD_PUBLIC_SERVER_URL
         value: https://selfcast-cms-admin.onrender.com
+      - key: DEBUG
+        value: payload*
     autoDeploy: true
