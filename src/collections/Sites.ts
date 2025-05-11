@@ -952,7 +952,7 @@ const Sites: CollectionConfig = {
               type: 'relationship',
               relationTo: 'media',
               hasMany: true,
-              max: 3,
+              maxRows: 3,
               admin: {
                 description: 'Select projects to feature (max 3)',
                 condition: (data, siblingData) => siblingData?.visible === true,
