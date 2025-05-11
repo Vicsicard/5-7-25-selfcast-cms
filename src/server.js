@@ -67,6 +67,7 @@ app.get('/diagnostics', (req, res) => {
             <a href="/admin">Admin Panel</a>
             <a href="/admin/">Admin Panel (with trailing slash)</a>
             <a href="/admin-direct">Admin Panel (Direct Route)</a>
+            <a href="/custom-admin">Custom Admin Interface</a>
             <a href="/api/globals">API Globals</a>
             <a href="/api/test">API Test</a>
             <a href="/health">Health Check</a>
@@ -76,7 +77,11 @@ app.get('/diagnostics', (req, res) => {
         <div class="section">
           <h2>Admin Panel Status</h2>
           <p>The admin panel should be accessible at: <code>${process.env.SERVER_URL}/admin/</code></p>
-          <p>If you're having trouble accessing it, try the "Admin Panel (Direct Route)" link above.</p>
+          <p>If you're having trouble accessing it, try these alternatives:</p>
+          <ul>
+            <li><strong>Admin Panel (Direct Route)</strong>: A direct redirect to the admin panel</li>
+            <li><strong>Custom Admin Interface</strong>: A custom interface that embeds the admin panel in an iframe</li>
+          </ul>
         </div>
         
         <div class="section">
@@ -121,6 +126,64 @@ const start = async () => {
       message: 'API is working correctly',
       timestamp: new Date().toISOString()
     });
+  });
+  
+  // Add a custom admin entry point
+  app.get('/custom-admin', (req, res) => {
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Payload CMS Admin</title>
+          <style>
+            body, html {
+              margin: 0;
+              padding: 0;
+              height: 100%;
+              overflow: hidden;
+            }
+            .container {
+              display: flex;
+              flex-direction: column;
+              height: 100vh;
+            }
+            .header {
+              background: #f8f9fa;
+              padding: 10px 20px;
+              border-bottom: 1px solid #ddd;
+            }
+            .content {
+              flex: 1;
+              display: flex;
+            }
+            iframe {
+              flex: 1;
+              border: none;
+              width: 100%;
+              height: 100%;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h2>SelfCast CMS Admin</h2>
+            </div>
+            <div class="content">
+              <iframe src="${process.env.SERVER_URL}/admin/" id="admin-frame"></iframe>
+            </div>
+          </div>
+          <script>
+            // Monitor iframe for errors
+            document.getElementById('admin-frame').onerror = function() {
+              console.error('Failed to load admin panel in iframe');
+            };
+          </script>
+        </body>
+      </html>
+    `);
   });
   
   // Add a direct route to the admin panel
