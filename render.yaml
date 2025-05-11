@@ -3,8 +3,8 @@ services:
     name: selfcast-cms-admin
     runtime: node
     plan: free
-    buildCommand: npm run build
-    startCommand: npm start
+    buildCommand: npm install && npx payload build
+    startCommand: node dist/server.js
     envVars:
       - key: MONGODB_URI
         value: mongodb+srv://Testuser:Testing123456@payloadonetorulethemall.9t4fnbt.mongodb.net/payload-cms?retryWrites=true&w=majority&appName=Payloadonetorulethemall
@@ -14,6 +14,8 @@ services:
         value: production
       - key: PAYLOAD_CONFIG_PATH
         value: src/payload.config.ts
+      - key: PORT
+        value: 10000
       - key: NEXT_PUBLIC_API_URL
         value: https://selfcast-cms-admin.onrender.com/api
       - key: PAYLOAD_PUBLIC_SERVER_URL
