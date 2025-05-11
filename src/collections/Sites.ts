@@ -1,4 +1,4 @@
-﻿import { CollectionConfig } from 'payload/types';
+import { CollectionConfig } from 'payload/types';
 import React from 'react';
 
 const Sites: CollectionConfig = {
@@ -1343,6 +1343,11 @@ const Sites: CollectionConfig = {
           }
         }
       ]
+    },
+    
+    // Site settings for template selection and deployment
+    {
+      name: 'siteSettings',
       type: 'group',
       admin: {
         description: 'Technical settings for your website',
