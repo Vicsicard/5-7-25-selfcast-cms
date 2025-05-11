@@ -1,4 +1,4 @@
-import { buildConfig } from 'payload/config';
+import { buildConfig } from 'payload/config.js';
 import { mongooseAdapter } from '@payloadcms/db-mongodb';
 import { webpackBundler } from '@payloadcms/bundler-webpack';
 import { slateEditor } from '@payloadcms/richtext-slate';
@@ -13,6 +13,7 @@ import Quotes from './collections/Quotes';
 import Media from './collections/Media';
 import Messages from './collections/Messages';
 import Projects from './collections/Projects';
+import GlobalComponents from './collections/GlobalComponents';
 
 // Import custom components
 import UserSelector from './components/UserSelector';
@@ -51,6 +52,7 @@ export default buildConfig({
     BioCards,
     Quotes,
     Projects,
+    GlobalComponents,
     Media,
     Messages,
     // Users collection for authentication
