@@ -67,13 +67,17 @@ const start = async () => {
     });
   });
   
+  // Serve a custom admin entry point
+  app.get('/admin', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'public', 'admin.html'));
+  });
+
   // Redirect root to Admin panel
   app.get('/', (_, res) => {
     res.redirect('/admin');
   });
   
-    // Let Payload handle all admin routes by default
-  // No need for explicit admin route handling
+  // Handle /admin/ route (with trailing slash) for Payload
   
   // Add a catch-all route handler for any undefined routes
   app.use((req, res, next) => {

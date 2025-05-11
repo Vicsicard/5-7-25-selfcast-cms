@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SelfCast CMS Admin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            line-height: 1.6;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .button {
+            display: inline-block;
+            background-color: #4a90e2;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 20px 0;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #357abD;
+        }
+        .info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #4a90e2;
+            padding: 15px;
+            margin: 30px 0;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>SelfCast CMS Admin Panel</h1>
+    
+    <p>Welcome to the SelfCast CMS administration interface. Click the button below to access the admin panel.</p>
+    
+    <a href="/admin/" class="button">Access Admin Panel</a>
+    
+    <div class="info">
+        <p><strong>Note:</strong> If you're experiencing issues accessing the admin panel, please try:</p>
+        <ul>
+            <li>Clearing your browser cache</li>
+            <li>Using a different browser</li>
+            <li>Checking your network connection</li>
+        </ul>
+    </div>
+    
+    <p>If you continue to experience issues, please contact support.</p>
+    
+    <script>
+        // Automatically redirect to the admin panel after a short delay
+        setTimeout(function() {
+            window.location.href = "/admin/";
+        }, 2000);
+    </script>
+</body>
+</html>
