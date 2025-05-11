@@ -3,8 +3,8 @@ services:
     name: selfcast-cms-admin
     runtime: node
     plan: free
-    buildCommand: npm install && npm install express
-    startCommand: node api/simple.js
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
       - key: MONGODB_URI
         value: mongodb+srv://Testuser:Testing123456@payloadonetorulethemall.9t4fnbt.mongodb.net/payload-cms?retryWrites=true&w=majority&appName=Payloadonetorulethemall
@@ -12,6 +12,8 @@ services:
         value: selfcast-studios-7af51d0c-ac48-4845-a41a
       - key: NODE_ENV
         value: production
+      - key: PAYLOAD_CONFIG_PATH
+        value: src/payload.config.ts
       - key: PORT
         value: 10000
       - key: NEXT_PUBLIC_API_URL
