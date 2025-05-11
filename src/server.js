@@ -12,19 +12,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Redirect root to Admin panel
-app.get('/', (_, res) => {
-  res.redirect('/admin');
-});
-
-// Add a catch-all route handler for debugging
-app.use((req, res, next) => {
-  if (req.path.startsWith('/admin') || req.path.startsWith('/api')) {
-    return next();
-  }
-  res.status(404).send(`Route not found: ${req.path}`);
-});
-
 // Start the server
 const start = async () => {
   // Initialize Payload
@@ -50,9 +37,24 @@ const start = async () => {
     onInit: async () => {
       payload.logger.info(`Payload Admin URL: ${payload.getAdminURL()}`);
       payload.logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      payload.logger.info(`Payload CMS initialized with custom user access control`);
     },
   });
-
+  
+  // Add a simple test route
+  app.get('/api/test', (req, res) => {
+    res.json({
+      status: 'success',
+      message: 'API is working correctly',
+      timestamp: new Date().toISOString()
+    });
+  });
+  
+  // Redirect root to Admin panel
+  app.get('/', (_, res) => {
+    res.redirect('/admin');
+  });
+  
   // Always start the server for both development and production
   // Use the PORT environment variable provided by Render
   const PORT = process.env.PORT || 3000;
