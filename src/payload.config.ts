@@ -23,7 +23,7 @@ import UserSelector from './components/UserSelector';
 
 export default buildConfig({
   // Set the server URL to the Render deployment URL
-  serverURL: process.env.SERVER_URL || 'https://selfcast-cms-admin.onrender.com',
+  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || process.env.SERVER_URL || 'https://selfcast-cms-admin.onrender.com',
   admin: {
     user: 'users',
     bundler: webpackBundler(),

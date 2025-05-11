@@ -13,3 +13,14 @@ const serverDest = path.join(distDir, 'server.js');
 
 fs.copyFileSync(serverSrc, serverDest);
 console.log('Server file copied to dist directory');
+
+// Ensure public directory exists in dist
+const distPublicDir = path.join(distDir, 'public');
+if (!fs.existsSync(distPublicDir)) {
+  fs.mkdirSync(distPublicDir, { recursive: true });
+}
+
+// Log build completion
+console.log('Build process completed successfully');
+console.log(`Server URL: ${process.env.PAYLOAD_PUBLIC_SERVER_URL || process.env.SERVER_URL || 'https://selfcast-cms-admin.onrender.com'}`);
+console.log('Admin panel should be available at /admin after deployment');
