@@ -770,7 +770,7 @@ const Sites: CollectionConfig = {
             {
               name: 'postId',
               type: 'relationship',
-              relationTo: 'posts',
+              relationTo: 'blog-posts',
               admin: {
                 description: 'Select a specific post to feature',
                 condition: (data, siblingData) => siblingData?.selectionType === 'manual',
