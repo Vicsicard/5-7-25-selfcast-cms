@@ -12,6 +12,7 @@ import BioCards from './collections/BioCards';
 import Quotes from './collections/Quotes';
 import Media from './collections/Media';
 import Messages from './collections/Messages';
+import Projects from './collections/Projects';
 
 // Import custom components
 import UserSelector from './components/UserSelector';
@@ -49,6 +50,7 @@ export default buildConfig({
     SocialPosts,
     BioCards,
     Quotes,
+    Projects,
     Media,
     Messages,
     // Users collection for authentication
