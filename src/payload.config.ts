@@ -18,9 +18,8 @@ import GlobalComponents from './collections/GlobalComponents';
 // Import custom components
 import UserSelector from './components/UserSelector';
 
-// Import css
-import './styles/globals.css';
-import './styles/admin.scss';
+// CSS imports are handled by Payload's bundler
+// We're removing direct CSS imports to avoid compilation issues
 
 export default buildConfig({
   admin: {
