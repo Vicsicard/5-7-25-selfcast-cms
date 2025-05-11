@@ -63,6 +63,12 @@ const start = async () => {
     });
   });
   
+  // Explicitly serve admin routes
+  app.get('/admin*', (req, res, next) => {
+    console.log(`Admin route accessed: ${req.url}`);
+    next(); // Let Payload handle it
+  });
+  
   // Redirect root to Admin panel
   app.get('/', (_, res) => {
     res.redirect('/admin');

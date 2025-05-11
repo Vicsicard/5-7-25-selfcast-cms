@@ -22,7 +22,13 @@ import UserSelector from './components/UserSelector';
 // We're removing direct CSS imports to avoid compilation issues
 
 export default buildConfig({
-  serverURL: process.env.SERVER_URL || '',
+  serverURL: process.env.SERVER_URL || 'https://selfcast-cms-admin.onrender.com',
+  routes: {
+    admin: '/admin',
+    api: '/api',
+    graphQL: '/api/graphql',
+    graphQLPlayground: '/api/graphql-playground',
+  },
   admin: {
     user: 'users',
     bundler: webpackBundler(),
