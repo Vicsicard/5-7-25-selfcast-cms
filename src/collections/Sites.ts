@@ -950,7 +950,7 @@ const Sites: CollectionConfig = {
             {
               name: 'projectIds',
               type: 'relationship',
-              relationTo: 'projects',
+              relationTo: 'media',
               hasMany: true,
               max: 3,
               admin: {
@@ -1340,6 +1340,169 @@ const Sites: CollectionConfig = {
           admin: {
             description: 'URL for the call-to-action button',
             condition: (data, siblingData) => siblingData?.showCTA === true,
+          }
+        }
+      ]
+    },
+    
+    // Projects page structure
+    {
+      name: 'projects',
+      type: 'group',
+      admin: {
+        description: 'Manage content for your Projects page',
+        className: 'projects-page-group',
+      },
+      fields: [
+        // Page Header
+        {
+          name: 'title',
+          type: 'text',
+          defaultValue: 'Our Projects',
+          admin: {
+            description: 'The main page title'
+          }
+        },
+        {
+          name: 'navLabel',
+          type: 'text',
+          defaultValue: 'Projects',
+          admin: {
+            description: 'Custom label shown in the navigation menu'
+          }
+        },
+        {
+          name: 'description',
+          type: 'textarea',
+          admin: {
+            description: 'The description text below the title'
+          }
+        },
+        // Filter Navigation
+        {
+          name: 'showCategories',
+          type: 'checkbox',
+          defaultValue: true,
+          admin: {
+            description: 'Toggle to show/hide category filters'
+          }
+        },
+        // Projects Grid
+        {
+          name: 'gridLayout',
+          type: 'select',
+          options: [
+            { label: '2 Columns', value: 'grid-2' },
+            { label: '3 Columns', value: 'grid-3' },
+            { label: 'List View', value: 'list' }
+          ],
+          defaultValue: 'grid-3',
+          admin: {
+            description: 'Layout for projects grid'
+          }
+        },
+        {
+          name: 'cardStyle',
+          type: 'select',
+          options: [
+            { label: 'Standard', value: 'standard' },
+            { label: 'Minimal', value: 'minimal' },
+            { label: 'Featured', value: 'featured' }
+          ],
+          defaultValue: 'standard',
+          admin: {
+            description: 'Visual style for project cards'
+          }
+        },
+        {
+          name: 'projectsPerPage',
+          type: 'number',
+          defaultValue: 9,
+          admin: {
+            description: 'Number of projects to display per page'
+          }
+        },
+        // Featured Projects
+        {
+          name: 'featuredProjects',
+          type: 'group',
+          admin: {
+            description: 'Featured projects section settings'
+          },
+          fields: [
+            {
+              name: 'visible',
+              type: 'checkbox',
+              defaultValue: true,
+              admin: {
+                description: 'Toggle to show/hide featured projects section'
+              }
+            },
+            {
+              name: 'heading',
+              type: 'text',
+              defaultValue: 'Featured Projects',
+              admin: {
+                description: 'Heading for featured projects section',
+                condition: (data, siblingData) => siblingData?.visible === true
+              }
+            },
+            {
+              name: 'projectIds',
+              type: 'relationship',
+              relationTo: 'projects',
+              hasMany: true,
+              max: 3,
+              admin: {
+                description: 'Manual selection of featured projects',
+                condition: (data, siblingData) => siblingData?.visible === true
+              }
+            }
+          ]
+        },
+        // Call to Action
+        {
+          name: 'showCTA',
+          type: 'checkbox',
+          defaultValue: true,
+          admin: {
+            description: 'Toggle to show/hide call-to-action section'
+          }
+        },
+        {
+          name: 'ctaHeading',
+          type: 'text',
+          defaultValue: 'Have a Project in Mind?',
+          admin: {
+            description: 'Heading for the call-to-action section',
+            condition: (data, siblingData) => siblingData?.showCTA === true
+          }
+        },
+        {
+          name: 'ctaText',
+          type: 'textarea',
+          defaultValue: 'Contact us to discuss your project ideas. We\'d love to help bring your vision to life.',
+          admin: {
+            description: 'Text content for the call-to-action',
+            condition: (data, siblingData) => siblingData?.showCTA === true
+          }
+        },
+        {
+          name: 'ctaButtonText',
+          type: 'text',
+          defaultValue: 'Get in Touch',
+          admin: {
+            description: 'Text for the call-to-action button',
+            condition: (data, siblingData) => siblingData?.showCTA === true
+          }
+        },
+        {
+          name: 'ctaButtonURL',
+          type: 'text',
+          defaultValue: '/contact',
+          admin: {
+            description: 'URL for the call-to-action button',
+            condition: (data, siblingData) => siblingData?.showCTA === true
           }
         }
       ]
