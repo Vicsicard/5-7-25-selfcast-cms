@@ -1,102 +1,18 @@
+/**
+ * This is a minimal server setup for Payload CMS
+ * Following best practices for middleware order and configuration
+ */
+
 const express = require('express');
 const payload = require('payload');
-const path = require('path');
-const cors = require('cors');
 require('dotenv').config();
 
 // Create Express app
 const app = express();
 
-// Enable CORS for all routes
-app.use(cors());
-
-// Add middleware to log all requests
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-  next();
-});
-
-// Add health check endpoint
+// Add health check endpoint before Payload initialization
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-// Create a diagnostic page for troubleshooting
-app.get('/diagnostics', (req, res) => {
-  // Get information about the server environment
-  const diagnosticInfo = {
-    nodeEnv: process.env.NODE_ENV || 'not set',
-    port: process.env.PORT || '3000',
-    payloadSecret: process.env.PAYLOAD_SECRET ? 'set' : 'not set',
-    mongodbUri: process.env.MONGODB_URI ? 'set' : 'not set',
-    serverUrl: process.env.SERVER_URL || 'not set',
-    dirname: __dirname,
-    cwd: process.cwd(),
-    nodeVersion: process.version,
-    memoryUsage: process.memoryUsage(),
-    uptime: process.uptime(),
-    timestamp: new Date().toISOString()
-  };
-  
-  res.send(`
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>Payload CMS Diagnostics</title>
-        <style>
-          body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-          h1 { color: #333; }
-          pre { background: #f5f5f5; padding: 15px; border-radius: 5px; overflow-x: auto; }
-          .links { margin: 20px 0; }
-          .links a { display: inline-block; margin-right: 15px; }
-          .section { margin-bottom: 30px; }
-        </style>
-      </head>
-      <body>
-        <h1>Payload CMS Diagnostics</h1>
-        
-        <div class="section">
-          <h2>Environment Information</h2>
-          <pre>${JSON.stringify(diagnosticInfo, null, 2)}</pre>
-        </div>
-        
-        <div class="section">
-          <h2>Test Links</h2>
-          <div class="links">
-            <a href="/">Home</a>
-            <a href="/admin">Admin Panel</a>
-            <a href="/admin/">Admin Panel (with trailing slash)</a>
-            <a href="/admin-direct">Admin Panel (Direct Route)</a>
-            <a href="/custom-admin">Custom Admin Interface</a>
-            <a href="/api/globals">API Globals</a>
-            <a href="/api/test">API Test</a>
-            <a href="/health">Health Check</a>
-          </div>
-        </div>
-        
-        <div class="section">
-          <h2>Admin Panel Status</h2>
-          <p>The admin panel should be accessible at: <code>${process.env.SERVER_URL}/admin/</code></p>
-          <p>If you're having trouble accessing it, try these alternatives:</p>
-          <ul>
-            <li><strong>Admin Panel (Direct Route)</strong>: A direct redirect to the admin panel</li>
-            <li><strong>Custom Admin Interface</strong>: A custom interface that embeds the admin panel in an iframe</li>
-          </ul>
-        </div>
-        
-        <div class="section">
-          <h2>Admin Panel Troubleshooting</h2>
-          <p>If you're having trouble accessing the admin panel, try these steps:</p>
-          <ol>
-            <li>Check that MongoDB is properly connected</li>
-            <li>Verify that the Payload CMS build completed successfully</li>
-            <li>Try accessing the admin panel with and without a trailing slash</li>
-            <li>Clear your browser cache or try a different browser</li>
-          </ol>
-        </div>
-      </body>
-    </html>
-  `);
 });
 
 // Start the server
@@ -107,19 +23,18 @@ const start = async () => {
     console.log(`Setting SERVER_URL to ${process.env.SERVER_URL}`);
   }
 
-  // Initialize Payload
+  // Initialize Payload with minimal configuration
   await payload.init({
     secret: process.env.PAYLOAD_SECRET,
     mongoURL: process.env.MONGODB_URI,
     express: app,
-    onInit: async () => {
-      payload.logger.info(`Payload Admin URL: ${payload.getAdminURL()}`);
-      payload.logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
-      payload.logger.info(`Server URL: ${process.env.SERVER_URL}`);
+    onInit: () => {
+      payload.logger.info(`Payload CMS initialized successfully`);
+      payload.logger.info(`Admin URL: ${process.env.SERVER_URL}/admin`);
     },
   });
-  
-  // Add a simple test route
+
+  // Add a simple test API endpoint
   app.get('/api/test', (req, res) => {
     res.json({
       status: 'success',
@@ -127,94 +42,13 @@ const start = async () => {
       timestamp: new Date().toISOString()
     });
   });
-  
-  // Add a custom admin entry point
-  app.get('/custom-admin', (req, res) => {
-    res.send(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Payload CMS Admin</title>
-          <style>
-            body, html {
-              margin: 0;
-              padding: 0;
-              height: 100%;
-              overflow: hidden;
-            }
-            .container {
-              display: flex;
-              flex-direction: column;
-              height: 100vh;
-            }
-            .header {
-              background: #f8f9fa;
-              padding: 10px 20px;
-              border-bottom: 1px solid #ddd;
-            }
-            .content {
-              flex: 1;
-              display: flex;
-            }
-            iframe {
-              flex: 1;
-              border: none;
-              width: 100%;
-              height: 100%;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h2>SelfCast CMS Admin</h2>
-            </div>
-            <div class="content">
-              <iframe src="${process.env.SERVER_URL}/admin/" id="admin-frame"></iframe>
-            </div>
-          </div>
-          <script>
-            // Monitor iframe for errors
-            document.getElementById('admin-frame').onerror = function() {
-              console.error('Failed to load admin panel in iframe');
-            };
-          </script>
-        </body>
-      </html>
-    `);
-  });
-  
-  // Add a direct route to the admin panel
-  app.get('/admin-direct', (req, res) => {
-    res.send(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Admin Panel Redirect</title>
-          <meta http-equiv="refresh" content="0;url=${process.env.SERVER_URL}/admin/" />
-        </head>
-        <body>
-          <p>Redirecting to admin panel...</p>
-          <script>
-            window.location.href = '${process.env.SERVER_URL}/admin/';
-          </script>
-        </body>
-      </html>
-    `);
-  });
-  
-  // Redirect root to diagnostics page
+
+  // Redirect root to admin panel
   app.get('/', (_, res) => {
-    res.redirect('/diagnostics');
+    res.redirect('/admin');
   });
-  
-  // Serve static files from the public directory
-  app.use(express.static(path.resolve(__dirname, 'public')));
-  
-  // Always start the server for both development and production
-  // Use the PORT environment variable provided by Render
+
+  // Start the server
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
     payload.logger.info(`Server started on port ${PORT}`);
