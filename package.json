@@ -5,8 +5,8 @@
   "main": "src/server.js",
   "scripts": {
     "dev": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts nodemon",
-    "build": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts payload build && node build.js",
-    "start": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts node dist/server.js",
+    "build": "tsc && cross-env PAYLOAD_CONFIG_PATH=dist/payload.config.js payload build && node build.js",
+    "start": "cross-env PAYLOAD_CONFIG_PATH=dist/payload.config.js node dist/server.js",
     "vercel-build": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.simple.ts payload build",
     "build:payload": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts payload build",
     "setup-relationships": "node src/setup-relationships.js",
