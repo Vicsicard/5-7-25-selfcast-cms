@@ -5,18 +5,18 @@ import { slateEditor } from '@payloadcms/richtext-slate';
 import path from 'path';
 
 // Import collections
-import Sites from './collections/Sites';
-import BlogPosts from './collections/BlogPosts';
-import SocialPosts from './collections/SocialPosts';
-import BioCards from './collections/BioCards';
-import Quotes from './collections/Quotes';
-import Media from './collections/Media';
-import Messages from './collections/Messages';
-import Projects from './collections/Projects';
-import GlobalComponents from './collections/GlobalComponents';
+import Sites from './collections/Sites.js';
+import BlogPosts from './collections/BlogPosts.js';
+import SocialPosts from './collections/SocialPosts.js';
+import BioCards from './collections/BioCards.js';
+import Quotes from './collections/Quotes.js';
+import Media from './collections/Media.js';
+import Messages from './collections/Messages.js';
+import Projects from './collections/Projects.js';
+import GlobalComponents from './collections/GlobalComponents.js';
 
 // Import custom components
-import UserSelector from './components/UserSelector';
+import UserSelector from './components/UserSelector.js';
 
 // Import css
 import './styles/globals.css';
