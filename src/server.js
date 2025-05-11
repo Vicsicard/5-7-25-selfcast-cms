@@ -1,15 +1,24 @@
 const express = require('express');
 const payload = require('payload');
 const path = require('path');
+const cors = require('cors');
 require('dotenv').config();
 
 // Create Express app
 const app = express();
 
+// Enable CORS for all routes
+app.use(cors());
+
 // Add middleware to log all requests
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
   next();
+});
+
+// Add health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Start the server
@@ -31,7 +40,11 @@ const start = async () => {
     maxDepth: 10, // Prevent excessive query depth
     graphQL: {
       maxComplexity: 1000, // Limit GraphQL query complexity
-      disablePlaygroundInProduction: true,
+      disablePlaygroundInProduction: false, // Enable playground even in production
+    },
+    admin: {
+      user: 'users',
+      disable: false, // Ensure admin is enabled
     },
     // Log initialization
     onInit: async () => {

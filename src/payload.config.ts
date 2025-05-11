@@ -22,6 +22,7 @@ import UserSelector from './components/UserSelector';
 // We're removing direct CSS imports to avoid compilation issues
 
 export default buildConfig({
+  serverURL: process.env.SERVER_URL || '',
   admin: {
     user: 'users',
     bundler: webpackBundler(),
